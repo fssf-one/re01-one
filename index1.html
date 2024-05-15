@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>简易购物网站</title>
+<script>
+// 模拟用户数据存储
+let users = {};
+ 
+// 销售人员ID管理
+let salespersons = {};
+ 
+// 用户注册
+function register() {
+ let username = document.getElementById('regUsername').value;
+ let password = document.getElementById('regPassword').value;
+ fetch('/register', {
+   method: 'POST',
+   headers: {
+     'Content-Type': 'application/json',
+   },
+   body: JSON.stringify({ username, password }),
+ })
+ .then(response => response.json())
+ .then(data => alert(data.message))
+ .catch(error => console.error('Error:', error));
+}
+ 
+// 用户登录
+function login() {
+ let username = document.getElementById('loginUsername').value;
+ let password = document.getElementById('loginPassword').value;
+ fetch('/login', {
+   method: 'POST',
+   headers: {
+     'Content-Type': 'application/json',
+   },
+   body: JSON.stringify({ username, password }),
+ })
+ .then(response => response.json())
+ .then(data => alert(data.message))
+ .catch(error => console.error('Error:', error));
+}
+// 浏览商品
+function viewProducts() {
+ fetch('/products')
+ .then(response => response.json())
+ .then(data => {
+   let productList = document.getElementById('productList');
+   productList.innerHTML = '';
+   for (let product in data) {
+     productList.innerHTML += `<li>${product} - 价格: ${data[product].price} - 库存: ${data[product].stock}</li>`;
+   }
+ })
+ .catch(error => console.error('Error:', error));
+}
+ 
+// 购买商品
+function buyProduct(productName) {
+ fetch('/buy', {
+   method: 'POST',
+   headers: {
+     'Content-Type': 'application/json',
+   },
+   body: JSON.stringify({ productName }),
+ })
+ .then(response => response.json())
+ .then(data => {
+   alert(data.message);
+   viewProducts(); // 刷新商品列表
+ })
+ .catch(error => console.error('Error:', error));
+}
+
+// 商品目录管理
+function manageCatalog() {
+ // 添加商品类别
+ let newProduct = document.getElementById('newProduct').value;
+ let newPrice = parseFloat(document.getElementById('newPrice').value);
+ let newStock = parseInt(document.getElementById('newStock').);
+ fetch('/addProduct', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ productName: newProduct, price: newPrice, stock: newStock }),
+ })
+ .then(response => response.json())
+ .then(data => alert(data.message))
+ .catch(error => console.error('Error:', error));
+ 
+ // 删除商品类
+ let deleteProduct = document.getElementById('deleteProduct').value;
+ fetch(`/deleteProduct/${deleteProduct}`, {
+  method: 'DELETE',
+ })
+ .then(response => response.json())
+ .then(data => alert(data.message))
+ .catch(error => console.error('Error:', error));
+}
+
+// 商品信息修改
+function modifyProductInfo() {
+ let product = document.getElementById('modifyProduct').value;
+ let newPrice = parseFloat(document.getElementById('modifyPrice').value);
+ let newStock = parseInt(document.getElementById('modifyStock').value);
+ fetch(`/modifyProduct/${product}`, {
+  method: 'PUT',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ price: newPrice, stock: newStock }),
+ })
+ .then(response => response.json())
+ .then(data => alert(data.message))
+ .catch(error => console.error('Error:', error));
+}
+ 
+// 销售状态监控
+function monitorSalesStatus() {
+ fetch('/salesStatus')
+ .then(response => response.json())
+ .then(data => {
+   let salesStatus = document.getElementById('salesStatus');
+   salesStatus.innerHTML = '';
+   for (let product in data) {
+     salesStatus.innerHTML += `<li>${product} - 价格: ${data[product].price} - 库存: ${data[product].stock} - 销量: ${data[product].sales}</li>`;
+   }
+ })
+ .catch(error => console.error('Error:', error));
+}
+
+// 用户购买日志
+function viewPurchaseLog() {
+ fetch('/purchaseLog')
+ .then(response => response.json())
+ .then(data => {
+   let purchaseLog = document.getElementById('purchaseLog');
+   purchaseLog.innerHTML = '';
+   data.forEach(log => {
+     purchaseLog.innerHTML += `<li>${log}</li>`;
+   });
+ })
+ .catch(error => console.error('Error:',));
+}
+
+// 销售人员ID管理
+function manageSalespersons() {
+ let salespersonId = document.getElementById('salespersonId').value;
+ let action = document.getElementById('salespersonAction').value;
+ if (action === 'add') {
+  fetch('/addSalesperson', {
+   method: 'POST',
+   headers: {
+     'Content-Type': 'application/json',
+   },
+   body: JSON.stringify({ salespersonId }),
+  })
+  .then(response => response.json())
+  .then(data => alert(data.message))
+  .catch(error => console.error('Error:', error));
+ } else if (action === 'delete') {
+  fetch(`/deleteSalesperson/${salespersonId}`, {
+   method: 'DELETE',
+  })
+  .then(response => response.json())
+  .then(data => alert(data.message))
+  .catch(error => console.error('Error:', error));
+ }
+}
+ 
+</script>
+</head>
+<body>
+ 
+<h2>用户注册</h2>
+<input type="text" id="regUsername" placeholder="用户名">
+<input type="password" id="regPassword" placeholder="密码">
+<button onclick="register()">注册</button>
+ 
+<h2>用户登录</h2>
+<input type="text" id="loginUsername" placeholder="用户名">
+<input type="password" id="loginPassword" placeholder="密码">
+<button onclick="login()">登录</button>
+ 
+<h2>浏览商品</h2>
+<button onclick="viewProducts()">浏览商品</button>
+<ul id="productList"></ul>
+ 
+<h2>购买商品</h2>
+<button onclick="buyProduct('手机')">购买手机</button>
+<button onclick="buyProduct('电脑')">购买电脑</button>
+ 
+<h2>商品目录管理</h2>
+<input type="text" id="newProduct" placeholder="新商品名称">
+<input type="number" id="newPrice" placeholder="新商品价格">
+<input type="number" id="newStock" placeholder="新商品库存">
+<button onclick="manageCatalog()">添加/删除商品</button>
+ 
+<h2>商品信息修改</h2>
+<input type="text" id="modifyProduct" placeholder="商品名称">
+<input type="number" id="modifyPrice" placeholder="新价格">
+<input type="number" id="modifyStock" placeholder="新库存">
+<button onclick="modifyProductInfo()">修改商品信息</button>
+ 
+<h2>销售状态监控</h2>
+<button onclick="monitorSalesStatus()">查看销售状态</button>
+<ul id="salesStatus"></ul>
+ 
+<h2>用户购买日志</h2>
+<button onclick="viewPurchaseLog()">查看购买日志</button>
+<ul id="purchaseLog"></ul>
+ 
+<h2>销售人员ID管理</h2>
+<input type="text" id="salespersonId" placeholder="销售人员ID">
+<select id="salespersonAction">
+ <option value="add">添加</option>
+ <option value="delete">删除</option>
+</select>
+<button onclick="manageSalespersons()">管理销售人员ID</button>
+ 
+</body>
+</html>
