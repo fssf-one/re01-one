@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>简易购物网站</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f2f2f2;
+    }
+    
+    h2 {
+        margin-top: 20px;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="number"],
+    select,
+    button {
+        margin: 5px;
+        padding: 5px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+
+    button {
+        cursor: pointer;
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    button:hover {
+        background-color: #45a049;
+    }
+
+    ul {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    li {
+        margin-top: 5px;
+        padding: 5px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+</style>
+<script>
+// 模拟用户数据存储
+let users = {};
+ 
+// 模拟商品数据存储
+let products = {
+ "手机": { "price": 2999, "stock": 100, "sales": 0 },
+ "电脑": { "price": 6999, "stock": 50, "sales": 0 },
+ // 添加更多商品
+};
+ 
+// 销售人员ID管理
+let salespersons = {};
+ 
+// 用户注册
+function register() {
+ let username = document.getElementById('regUsername').value;
+ let password = document.getElementById('regPassword').value;
+ if (users[username]) {
+     alert('用户名已存在');
+ } else {
+     users[username] = password;
+     alert('注册成功');
+ }
+}
+ 
+// 用户登录
+function login() {
+ let username = document.getElementById('loginUsername').value;
+ let password = document.getElementById('loginPassword').value;
+ if (users[username] && users[username] === password) {
+     alert('登录成功');
+     // 这里可以跳转到用户主页
+ } else {
+     alert('用户名或密码错误');
+ }
+}
+ 
+// 浏览商品
+function viewProducts() {
+ let productList = document.getElementById('productList');
+ productList.innerHTML = '';
+ for (let product in products) {
+     productList.innerHTML += `<li>${product} - 价格: ${products[product].price} - 库存: ${products[product].stock}</li>`;
+ }
+}
+ 
+// 购买商品
+function buyProduct(productName) {
+ if (products[productName].stock > 0) {
+     products[productName].stock--;
+     products[productName].sales++;
+     alert('购买成功，库存更新为：' + products[productName].stock);
+     // 记录购买日志
+     logPurchase(productName);
+ } else {
+     alert('库存不足');
+ }
+}
+ 
+// 商品目录管理
+function manageCatalog() {
+ // 添加商品类别
+ let newProduct = document.getElementById('newProduct').value;
+ let newPrice = parseFloat(document.getElementById('newPrice').value);
+ let newStock = parseInt(document.getElementById('newStock').value);
+ if (newProduct && !products[newProduct] && !isNaN(newPrice) && !isNaN(newStock)) {
+     products[newProduct] = { "price": newPrice, "stock": newStock, "sales": 0 };
+     alert('商品添加成功');
+ } else {
+     alert('商品信息不完整或有误');
+ }
+ 
+ // 删除商品类别
+ let deleteProduct = document.getElementById('deleteProduct').value;
+ if (deleteProduct && products[deleteProduct]) {
+     delete products[deleteProduct];
+     alert('商品删除成功');
+ } else {
+     alert('商品不存在');
+ }
+}
+ 
+// 商品信息修改
+function modifyProductInfo() {
+ let product = document.getElementById('modifyProduct').value;
+ let newPrice = parseFloat(document.getElementById('modifyPrice').value);
+ let newStock = parseInt(document.getElementById('modifyStock').value);
+ if (product && products[product] && !isNaN(newPrice) && !isNaN(newStock)) {
+     products[product].price = newPrice;
+     products[product].stock = newStock;
+     alert('商品信息更新成功');
+ } else {
+     alert('商品信息不完整或有误');
+ }
+}
+ 
+// 销售状态监控
+function monitorSalesStatus() {
+ let salesStatus = document.getElementById('salesStatus');
+ salesStatus.innerHTML = '';
+ for (let product in products) {
+     salesStatus.innerHTML += `<li>${product} - 价格: ${products[product].price} - 库存: ${products[product].stock} - 销量: ${products[product].sales}</li>`;
+ }
+}
+ 
+// 用户购买日志记录
+function logPurchase(productName) {
+ let purchaseLog = document.getElementById('purchaseLog');
+ purchaseLog.innerHTML += `<li>用户购买了 ${productName}</li>`;
+}
+ 
+// 销售人员ID管理
+function manageSalespersons() {
+ let salespersonId = document.getElementById('salespersonId').value;
+ let action = document.getElementById('salespersonAction').value;
+ if (action === 'add' && !salespersons[salespersonId]) {
+     salespersons[salespersonId] = true;
+     alert('销售人员ID添加成功');
+ } else if (action === 'delete' && salespersons[salespersonId]) {
+     delete salespersons[salespersonId];
+     alert('销售人员ID删除成功');
+ } else {
+     alert('操作无效');
+ }
+}
+ 
+// 登录口令重置
+function resetPassword() {
+ let salespersonId = document.getElementById('salespersonId').value;
+ if (salespersons[salespersonId]) {
+     let newPassword = prompt('请输入新的登录口令');
+     if (newPassword) {
+         alert('登录口令重置成功');
+         // 在实际应用中，需要将新密码存储到安全的地方
+     }
+ } else {
+     alert('销售人员ID不存在');
+ }
+}
+ 
+// 销售业绩查询和监控
+function querySalesPerformance() {
+ let salesReport = document.getElementById('salesReport');
+ salesReport.innerHTML = '';
+ for (let product in products) {
+     salesReport.innerHTML += `<li>${product} - 销量: ${products[product].sales}</li>`;
+ }
+}
+ 
+</script>
+</head>
+<body>
+ 
+<h2>用户注册</h2>
+<input type="text" id="regUsername" placeholder="用户名">
+<input type="password" id="regPassword" placeholder="密码">
+<button onclick="register()">注册</button>
+ 
+<h2>用户登录</h2>
+<input type="text" id="loginUsername" placeholder="用户名">
+<input type="password" id="loginPassword" placeholder="密码">
+<button onclick="login()">登录</button>
+ 
+<h2>浏览商品</h2>
+<button onclick="viewProducts()">浏览商品</button>
+<ul id="productList"></ul>
+ 
+<h2>购买商品</h2>
+<button onclick="buyProduct('手机')">购买手机</button>
+<button onclick="buyProduct('电脑')">购买电脑</button>
+<!-- 添加更多购买按钮 -->
+ 
+<h2>商品目录管理</h2>
+<input type="text" id="newProduct" placeholder="新商品名称">
+<input type="number" id="newPrice" placeholder="新商品价格">
+<input type="number" id="newStock" placeholder="新商品库存">
+<button onclick="manageCatalog()">添加/删除商品</button>
+ 
+<h2>商品信息修改</h2>
+<input type="text" id="modifyProduct" placeholder="商品名称">
+<input type="number" id="modifyPrice" placeholder="新价格">
+<input type="number" id="modifyStock" placeholder="新库存">
+<button onclick="modifyProductInfo()">修改商品信息</button>
+ 
+<h2>销售状态监控</h2>
+<button onclick="monitorSalesStatus()">查看销售状态</button>
+<ul id="salesStatus"></ul>
+ 
+<h2>用户购买日志</h2>
+<button onclick="viewProducts()">查看购买日志</button>
+<ul id="purchaseLog"></ul>
+ 
+<h2>销售人员ID管理</h2>
+<input type="text" id="salespersonId" placeholder="销售人员ID">
+<select id="salespersonAction">
+ <option value="add">添加</option>
+ <option value="delete">删除</option>
+</select>
+<button onclick="manageSalespersons()">管理销售人员ID</button>
+ 
+<h2>登录口令重置</h2>
+<input type="text" id="salespersonId" placeholder="销售人员ID">
+<button onclick="resetPassword()">重置登录口令</button>
+ 
+<h2>销售业绩查询和监控</h2>
+<button onclick="querySalesPerformance()">查询销售业绩</button>
+<ul id="salesReport"></ul>
+ 
+</body>
+</html>
